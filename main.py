@@ -14,7 +14,6 @@ utils.print_header(version=COMANCextract.__version__)
 params = utils.parse_file(sys.argv[1])
 
 for SourceID in list(params['sources'].keys()):
-
     new_wcs = WCS(naxis=2)
     new_wcs.wcs.crpix = np.asarray(params['wcs']['crpix']).astype(int)
     new_wcs.wcs.cdelt = np.asarray(params['wcs']['cdelt'])/60
@@ -41,12 +40,14 @@ for SourceID in list(params['sources'].keys()):
         map_wcs = map_healpix.reproject(new_wcs,new_shape)
         map_wcs.Beam2Pix()
         result = apPhotometry(map_wcs,
-                              [021.500642,-00.885663],
+                              params['sources'][SourceID]['coords'],
                               method=params['inputs']['method'],
                               plotout=pdf)
         S[n],Se[n] = result.out
         f[n] = map_param['freqGHz']
         n+=1
+        del map_healpix
+        del result
     plt.figure()
     ax = plt.subplot()
     ax.errorbar(f,S,yerr=Se,xerr=np.ones(Se.shape)*0.5,
@@ -58,7 +59,7 @@ for SourceID in list(params['sources'].keys()):
     plt.subplots_adjust(left=0.18,right=0.95)
     pdf.savefig()
 
-    outfile = h5py.File('Source:_{}.hd5'.format(params['sources'][SourceID]['name']),'r+')
+    outfile = h5py.File('Source:_{}.hd5'.format(params['sources'][SourceID]['name']),'a')
     if 'comap' not in outfile:
         outfile.create_group('comap')
     comap = outfile['comap']

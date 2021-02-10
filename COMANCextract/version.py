@@ -1,4 +1,4 @@
 # PIPELINE INFORMATION
 
 # VERSION: MAIN RELEASE: MAJOR UPDATE: MINOR UPDATE
-__version__  = '0.0.0'
+__version__  = '0.0.1'
